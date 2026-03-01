@@ -3,15 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Site de test</title>
+    <title>Mes habitudes sportives</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="container">
-      <h1>Bienvenue 👋</h1>
-      <p>Ce site basique sert à vérifier que tout fonctionne correctement.</p>
-      <button id="testButton">Clique-moi</button>
-      <p id="result" aria-live="polite"></p>
+      <header class="header">
+        <h1>🏋️ Mes habitudes</h1>
+        <p>Un tableau simple pour suivre ta routine quotidienne.</p>
+      </header>
+
+      <section class="stats" aria-label="Résumé des habitudes">
+        <article>
+          <h2 id="totalHabits">0</h2>
+          <p>Habitudes actives</p>
+        </article>
+        <article>
+          <h2 id="dailyHabits">0</h2>
+          <p>Fréquence quotidienne</p>
+        </article>
+        <article>
+          <h2 id="totalStreak">0</h2>
+          <p>Streak total</p>
+        </article>
+      </section>
+
+      <section class="habits-section">
+        <h2>Programme du jour</h2>
+        <ul id="habitList" class="habit-list"></ul>
+      </section>
     </main>
 
     <script src="script.js"></script>
