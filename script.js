@@ -78,15 +78,28 @@ const mergeHabits = (storedHabits, fallbackHabits) => {
 };
 
 
+const parseHabitsArray = (rawValue) => {
+  if (typeof rawValue !== 'string' || rawValue.trim() === '') {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(rawValue);
+    return Array.isArray(parsed) ? parsed : null;
+  } catch (error) {
+    return null;
+  }
+};
+
 const getStoredHabitsRaw = () => {
-  const current = localStorage.getItem(STORAGE_KEY);
-  if (typeof current === 'string') {
+  const current = parseHabitsArray(localStorage.getItem(STORAGE_KEY));
+  if (current) {
     return current;
   }
 
   for (const key of LEGACY_STORAGE_KEYS) {
-    const legacyValue = localStorage.getItem(key);
-    if (typeof legacyValue === 'string') {
+    const legacyValue = parseHabitsArray(localStorage.getItem(key));
+    if (legacyValue) {
       return legacyValue;
     }
   }
@@ -100,17 +113,8 @@ const loadHabits = () => {
     return defaultHabits.map((habit, index) => normalizeHabit(habit, Date.now() + index + Math.random()));
   }
 
-  try {
-    const parsedHabits = JSON.parse(storedHabits);
-    if (!Array.isArray(parsedHabits)) {
-      return defaultHabits.map((habit, index) => normalizeHabit(habit, Date.now() + index + Math.random()));
-    }
-
-    const safeHabits = parsedHabits.filter((habit) => typeof habit === 'object' && habit !== null);
-    return mergeHabits(safeHabits, defaultHabits);
-  } catch (error) {
-    return defaultHabits.map((habit, index) => normalizeHabit(habit, Date.now() + index + Math.random()));
-  }
+  const safeHabits = storedHabits.filter((habit) => typeof habit === 'object' && habit !== null);
+  return mergeHabits(safeHabits, defaultHabits);
 };
 
 let habits = loadHabits();
