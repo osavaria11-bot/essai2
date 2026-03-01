@@ -1,41 +1,129 @@
 :root {
-  color-scheme: light dark;
-  font-family: Arial, sans-serif;
+  font-family: Inter, Arial, sans-serif;
+  color: #1f2937;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  background: radial-gradient(circle at top, #dff4ff, #eefcf2 45%, #f7f8ff);
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, #e8f5ff, #d8ffed);
+  padding: 1.5rem;
 }
 
 .container {
-  background: rgba(255, 255, 255, 0.9);
+  width: min(960px, 100%);
+  background: #ffffffee;
+  border-radius: 18px;
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  max-width: 420px;
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.15);
 }
 
-button {
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1.25rem;
-  cursor: pointer;
-  background: #0b74de;
-  color: white;
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: clamp(1.7rem, 2vw + 1rem, 2.5rem);
+}
+
+.header p {
+  margin-top: 0.5rem;
+  color: #4b5563;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.stats article {
+  background: #f8fafc;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  padding: 0.9rem;
+  text-align: center;
+}
+
+.stats h2 {
+  margin: 0;
+  color: #1d4ed8;
+}
+
+.stats p {
+  margin: 0.4rem 0 0;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.habits-section h2 {
+  margin: 0 0 0.75rem;
+}
+
+.habit-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.habit-card {
+  border: 1px solid #e5e7eb;
+  border-left: 6px solid #10b981;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  display: grid;
+  gap: 0.35rem;
+  background: #ffffff;
+}
+
+.habit-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.habit-title-row h3 {
+  margin: 0;
   font-size: 1rem;
 }
 
-button:hover {
-  background: #065ab0;
+.badge {
+  background: #dbeafe;
+  color: #1e40af;
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
-#result {
-  margin-top: 1rem;
-  font-weight: bold;
-  color: #0f5132;
+.meta {
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 700px) {
+  .container {
+    padding: 1.2rem;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .habit-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
