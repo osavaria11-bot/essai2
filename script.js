@@ -1,4 +1,5 @@
-const STORAGE_KEY = 'mes-habitudes-data';
+const STORAGE_KEY = 'mes-habitudes-sportives-v2';
+const LEGACY_STORAGE_KEYS = ['mes-habitudes-data'];
 
 const defaultHabits = [
   {
@@ -76,23 +77,44 @@ const mergeHabits = (storedHabits, fallbackHabits) => {
   return [...merged, ...fallbackByName.values()];
 };
 
+
+const parseHabitsArray = (rawValue) => {
+  if (typeof rawValue !== 'string' || rawValue.trim() === '') {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(rawValue);
+    return Array.isArray(parsed) ? parsed : null;
+  } catch (error) {
+    return null;
+  }
+};
+
+const getStoredHabitsRaw = () => {
+  const current = parseHabitsArray(localStorage.getItem(STORAGE_KEY));
+  if (current) {
+    return current;
+  }
+
+  for (const key of LEGACY_STORAGE_KEYS) {
+    const legacyValue = parseHabitsArray(localStorage.getItem(key));
+    if (legacyValue) {
+      return legacyValue;
+    }
+  }
+
+  return null;
+};
+
 const loadHabits = () => {
-  const storedHabits = localStorage.getItem(STORAGE_KEY);
+  const storedHabits = getStoredHabitsRaw();
   if (!storedHabits) {
     return defaultHabits.map((habit, index) => normalizeHabit(habit, Date.now() + index + Math.random()));
   }
 
-  try {
-    const parsedHabits = JSON.parse(storedHabits);
-    if (!Array.isArray(parsedHabits)) {
-      return defaultHabits;
-    }
-
-    const safeHabits = parsedHabits.filter((habit) => typeof habit === 'object' && habit !== null);
-    return mergeHabits(safeHabits, defaultHabits);
-  } catch (error) {
-    return defaultHabits.map((habit, index) => normalizeHabit(habit, Date.now() + index + Math.random()));
-  }
+  const safeHabits = storedHabits.filter((habit) => typeof habit === 'object' && habit !== null);
+  return mergeHabits(safeHabits, defaultHabits);
 };
 
 let habits = loadHabits();
@@ -103,6 +125,11 @@ let displayedMonthDate = new Date(now.getFullYear(), now.getMonth(), 1);
 
 const saveHabits = () => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
+  LEGACY_STORAGE_KEYS.forEach((legacyKey) => {
+    if (legacyKey !== STORAGE_KEY) {
+      localStorage.removeItem(legacyKey);
+    }
+  });
 };
 
 const habitList = document.getElementById('habitList');
