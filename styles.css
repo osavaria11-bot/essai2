@@ -266,6 +266,25 @@ body {
 .check-icon.is-done {
   opacity: 1;
   text-shadow: 0 0 12px rgba(22, 163, 74, 0.25);
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actions button {
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1e3a8a;
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.actions button.delete {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
 }
 
 .empty-state {

@@ -7,6 +7,7 @@ const habits = [
     createdAt: '2026-03-01T21:07:00.527Z',
     logs: [],
     streak: 0,
+    doneToday: false,
   },
   {
     id: 5,
@@ -16,6 +17,7 @@ const habits = [
     createdAt: '2026-03-01T21:12:28.727Z',
     logs: [],
     streak: 0,
+    doneToday: false,
   },
   {
     id: 6,
@@ -25,6 +27,7 @@ const habits = [
     createdAt: '2026-03-01T21:12:39.163Z',
     logs: [],
     streak: 0,
+    doneToday: false,
   },
   {
     id: 7,
@@ -34,6 +37,7 @@ const habits = [
     createdAt: '2026-03-01T21:12:48.245Z',
     logs: [],
     streak: 0,
+    doneToday: false,
   },
 ];
 
@@ -163,6 +167,17 @@ const toggleDone = (habitId) => {
   renderStats();
   renderHabits();
   renderCalendar();
+  habit.doneToday = !habit.doneToday;
+  if (habit.doneToday) {
+    habit.logs.push(new Date().toISOString());
+    habit.streak += 1;
+  } else {
+    habit.logs.pop();
+    habit.streak = Math.max(0, habit.streak - 1);
+  }
+
+  renderStats();
+  renderHabits();
 };
 
 const removeHabit = (habitId) => {
@@ -193,6 +208,9 @@ const renderHabits = () => {
   habits.forEach((habit) => {
     const item = document.createElement('li');
     item.className = `habit-card ${hasLogForDay(habit, todayKey) ? 'done' : ''}`;
+  habits.forEach((habit) => {
+    const item = document.createElement('li');
+    item.className = `habit-card ${habit.doneToday ? 'done' : ''}`;
 
     const frequency = frequencyLabels[habit.frequency] ?? habit.frequency;
     const details = `Créée le ${formatDate(habit.createdAt)} • Logs: ${habit.logs.length} • Streak: ${habit.streak}`;
@@ -208,6 +226,15 @@ const renderHabits = () => {
           <p class="meta">${details}</p>
         </div>
         <button type="button" class="check-icon ${hasLogForDay(habit, todayKey) ? 'is-done' : ''}" data-action="toggle" aria-label="Valider ${habit.name}" title="Valider du jour">✓</button>
+      </div>
+      <div class="habit-title-row">
+        <h3>${habit.name}</h3>
+        <span class="badge">${frequency}</span>
+      </div>
+      <p class="meta">${details}</p>
+      <div class="actions">
+        <button type="button" data-action="toggle">${habit.doneToday ? 'Annuler du jour' : 'Valider du jour'}</button>
+        <button type="button" class="delete" data-action="delete">Supprimer</button>
       </div>
     `;
 
@@ -297,6 +324,7 @@ habitForm.addEventListener('submit', (event) => {
     createdAt: new Date().toISOString(),
     logs: [],
     streak: 0,
+    doneToday: false,
   });
 
   habitForm.reset();
