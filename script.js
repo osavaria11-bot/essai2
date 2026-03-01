@@ -1,4 +1,5 @@
-const STORAGE_KEY = 'mes-habitudes-data';
+const STORAGE_KEY = 'mes-habitudes-sportives-v2';
+const LEGACY_STORAGE_KEYS = ['mes-habitudes-data'];
 
 const defaultHabits = [
   {
@@ -39,31 +40,76 @@ const defaultHabits = [
   },
 ];
 
+const normalizeHabit = (habit, fallbackIdSeed = Date.now() + Math.random()) => ({
+  id: Number(habit.id) || fallbackIdSeed,
+  name: typeof habit.name === 'string' ? habit.name : 'Habitude sans nom',
+  description: null,
+  frequency: ['daily', 'weekly', 'monthly'].includes(habit.frequency) ? habit.frequency : 'daily',
+  createdAt: typeof habit.createdAt === 'string' ? habit.createdAt : new Date().toISOString(),
+  logs: Array.isArray(habit.logs) ? habit.logs.filter((entry) => typeof entry === 'string') : [],
+  streak: 0,
+});
+
+const mergeHabits = (storedHabits, fallbackHabits) => {
+  const fallbackByName = new Map(
+    fallbackHabits.map((habit) => [habit.name.trim().toLowerCase(), normalizeHabit(habit)]),
+  );
+  const merged = [];
+
+  storedHabits.forEach((habit, index) => {
+    const normalizedStored = normalizeHabit(habit, Date.now() + index + Math.random());
+    const key = normalizedStored.name.trim().toLowerCase();
+
+    if (fallbackByName.has(key)) {
+      const fallbackHabit = fallbackByName.get(key);
+      merged.push({
+        ...fallbackHabit,
+        ...normalizedStored,
+        id: normalizedStored.id,
+      });
+      fallbackByName.delete(key);
+      return;
+    }
+
+    merged.push(normalizedStored);
+  });
+
+  return [...merged, ...fallbackByName.values()];
+};
+
+
+const getStoredHabitsRaw = () => {
+  const current = localStorage.getItem(STORAGE_KEY);
+  if (typeof current === 'string') {
+    return current;
+  }
+
+  for (const key of LEGACY_STORAGE_KEYS) {
+    const legacyValue = localStorage.getItem(key);
+    if (typeof legacyValue === 'string') {
+      return legacyValue;
+    }
+  }
+
+  return null;
+};
+
 const loadHabits = () => {
-  const storedHabits = localStorage.getItem(STORAGE_KEY);
+  const storedHabits = getStoredHabitsRaw();
   if (!storedHabits) {
-    return defaultHabits;
+    return defaultHabits.map((habit, index) => normalizeHabit(habit, Date.now() + index + Math.random()));
   }
 
   try {
     const parsedHabits = JSON.parse(storedHabits);
     if (!Array.isArray(parsedHabits)) {
-      return defaultHabits;
+      return defaultHabits.map((habit, index) => normalizeHabit(habit, Date.now() + index + Math.random()));
     }
 
-    return parsedHabits
-      .filter((habit) => typeof habit === 'object' && habit !== null)
-      .map((habit) => ({
-        id: Number(habit.id) || Date.now() + Math.random(),
-        name: typeof habit.name === 'string' ? habit.name : 'Habitude sans nom',
-        description: null,
-        frequency: ['daily', 'weekly', 'monthly'].includes(habit.frequency) ? habit.frequency : 'daily',
-        createdAt: typeof habit.createdAt === 'string' ? habit.createdAt : new Date().toISOString(),
-        logs: Array.isArray(habit.logs) ? habit.logs.filter((entry) => typeof entry === 'string') : [],
-        streak: 0,
-      }));
+    const safeHabits = parsedHabits.filter((habit) => typeof habit === 'object' && habit !== null);
+    return mergeHabits(safeHabits, defaultHabits);
   } catch (error) {
-    return defaultHabits;
+    return defaultHabits.map((habit, index) => normalizeHabit(habit, Date.now() + index + Math.random()));
   }
 };
 
@@ -75,6 +121,11 @@ let displayedMonthDate = new Date(now.getFullYear(), now.getMonth(), 1);
 
 const saveHabits = () => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
+  LEGACY_STORAGE_KEYS.forEach((legacyKey) => {
+    if (legacyKey !== STORAGE_KEY) {
+      localStorage.removeItem(legacyKey);
+    }
+  });
 };
 
 const habitList = document.getElementById('habitList');

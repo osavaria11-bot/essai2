@@ -8,31 +8,32 @@
   </head>
   <body>
     <main class="container">
-      <header class="header">
-        <h1>🏋️ Mes habitudes</h1>
-        <p>Un tableau interactif pour suivre ta routine quotidienne.</p>
+      <header class="header card">
+        <p class="kicker">Coach personnel</p>
+        <h1>Mes habitudes sportives</h1>
+        <p class="subtitle">Un tableau élégant pour suivre ta progression et rester constant jour après jour.</p>
       </header>
 
       <section class="stats" aria-label="Résumé des habitudes">
-        <article>
+        <article class="card stat-card">
           <h2 id="totalHabits">0</h2>
           <p>Habitudes actives</p>
         </article>
-        <article>
+        <article class="card stat-card">
           <h2 id="dailyHabits">0</h2>
           <p>Quotidiennes</p>
         </article>
-        <article>
+        <article class="card stat-card">
           <h2 id="weeklyHabits">0</h2>
           <p>Hebdomadaires</p>
         </article>
-        <article>
+        <article class="card stat-card">
           <h2 id="monthlyHabits">0</h2>
           <p>Mensuelles</p>
         </article>
       </section>
 
-      <section class="progress-section" aria-label="Progression du jour">
+      <section class="progress-section card" aria-label="Progression du jour">
         <div class="progress-head">
           <h2 id="progressHeading">Objectif du jour</h2>
           <p id="progressText">0 / 0 habitudes complétées</p>
@@ -42,25 +43,11 @@
         </div>
       </section>
 
-      <section class="gallery-section" aria-label="Inspirations visuelles">
-        <h2>Inspirations</h2>
-        <div class="gallery-grid">
-          <article class="gallery-card">
-            <img src="assets/images/training-1.svg" alt="Illustration d'une barre de musculation" loading="lazy" />
-            <p>Planifie ta séance la veille pour démarrer sans friction.</p>
-          </article>
-          <article class="gallery-card">
-            <img src="assets/images/training-2.svg" alt="Illustration de matériel de gym" loading="lazy" />
-            <p>Prépare une routine courte de secours pour les jours chargés.</p>
-          </article>
-          <article class="gallery-card">
-            <img src="assets/images/training-3.svg" alt="Illustration d'une porte de traction" loading="lazy" />
-            <p>Visualise tes progrès: même 15 minutes comptent vraiment.</p>
-          </article>
+      <section class="controls card" aria-label="Ajouter une habitude">
+        <div class="section-title-row">
+          <h2>Ajouter un exercice</h2>
+          <span>Rapide et simple</span>
         </div>
-      </section>
-
-      <section class="controls" aria-label="Ajouter une habitude">
         <form id="habitForm" class="habit-form">
           <label>
             Habitude
@@ -80,7 +67,7 @@
         </form>
       </section>
 
-      <section class="calendar-section" aria-label="Calendrier des accomplissements">
+      <section class="calendar-section card" aria-label="Calendrier des accomplissements">
         <div class="calendar-header">
           <div class="calendar-title-wrap">
             <h2 id="calendarTitle">Calendrier</h2>
@@ -106,7 +93,7 @@
         <div id="calendarGrid" class="calendar-grid"></div>
       </section>
 
-      <section class="habits-section">
+      <section class="habits-section card">
         <div class="habits-header">
           <h2>Programme du jour</h2>
           <div class="filter-controls" aria-label="Filtrer les habitudes">
@@ -117,6 +104,24 @@
           </div>
         </div>
         <ul id="habitList" class="habit-list"></ul>
+      </section>
+
+      <section class="gallery-section" aria-label="Inspirations visuelles">
+        <h2>Inspirations</h2>
+        <div class="gallery-grid">
+          <article class="gallery-card card">
+            <img src="assets/images/training-1.svg" alt="Illustration d'une barre de musculation" loading="lazy" />
+            <p>Planifie ta séance la veille pour démarrer sans friction.</p>
+          </article>
+          <article class="gallery-card card">
+            <img src="assets/images/training-2.svg" alt="Illustration de matériel de gym" loading="lazy" />
+            <p>Prépare une routine courte de secours pour les jours chargés.</p>
+          </article>
+          <article class="gallery-card card">
+            <img src="assets/images/training-3.svg" alt="Illustration d'une porte de traction" loading="lazy" />
+            <p>Visualise tes progrès: même 15 minutes comptent vraiment.</p>
+          </article>
+        </div>
       </section>
     </main>
 
