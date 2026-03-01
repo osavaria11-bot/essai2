@@ -68,6 +68,7 @@ const loadHabits = () => {
 };
 
 let habits = loadHabits();
+let activeFilter = 'all';
 
 const saveHabits = () => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
@@ -77,11 +78,15 @@ const habitList = document.getElementById('habitList');
 const totalHabits = document.getElementById('totalHabits');
 const dailyHabits = document.getElementById('dailyHabits');
 const totalStreak = document.getElementById('totalStreak');
+const completionRate = document.getElementById('completionRate');
+const progressFill = document.getElementById('progressFill');
+const progressText = document.getElementById('progressText');
 const habitForm = document.getElementById('habitForm');
 const habitName = document.getElementById('habitName');
 const habitFrequency = document.getElementById('habitFrequency');
 const calendarGrid = document.getElementById('calendarGrid');
 const calendarTitle = document.getElementById('calendarTitle');
+const filterChips = [...document.querySelectorAll('.filter-chip')];
 
 const weekdayLabels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
@@ -143,6 +148,18 @@ const getDueHabitsForDate = (date) => {
 
     return false;
   });
+};
+
+const getTodayProgress = () => {
+  const today = new Date();
+  const dayKey = toDateKey(today);
+  const dueHabits = getDueHabitsForDate(today);
+  const completed = dueHabits.filter((habit) => hasLogForDay(habit, dayKey)).length;
+  return {
+    dueCount: dueHabits.length,
+    completedCount: completed,
+    rate: dueHabits.length === 0 ? 0 : Math.round((completed / dueHabits.length) * 100),
+  };
 };
 
 const isPerfectDay = (dayDate) => {
@@ -215,20 +232,31 @@ const removeHabit = (habitId) => {
   renderCalendar();
 };
 
+const getFilteredHabits = () => {
+  if (activeFilter === 'all') {
+    return habits;
+  }
+
+  return habits.filter((habit) => habit.frequency === activeFilter);
+};
+
 const renderHabits = () => {
   habitList.innerHTML = '';
 
-  if (habits.length === 0) {
+  const visibleHabits = getFilteredHabits();
+  if (visibleHabits.length === 0) {
     const empty = document.createElement('li');
     empty.className = 'empty-state';
-    empty.textContent = 'Aucune habitude pour le moment. Ajoute-en une ci-dessus.';
+    empty.textContent = activeFilter === 'all'
+      ? 'Aucune habitude pour le moment. Ajoute-en une ci-dessus.'
+      : "Aucune habitude ne correspond à ce filtre pour l'instant.";
     habitList.appendChild(empty);
     return;
   }
 
   const todayKey = toDateKey(new Date());
 
-  habits.forEach((habit) => {
+  visibleHabits.forEach((habit) => {
     const item = document.createElement('li');
     item.className = `habit-card ${hasLogForDay(habit, todayKey) ? 'done' : ''}`;
 
@@ -314,9 +342,15 @@ const renderCalendar = () => {
 };
 
 const renderStats = () => {
+  const todayProgress = getTodayProgress();
+
   totalHabits.textContent = String(habits.length);
   dailyHabits.textContent = String(habits.filter((habit) => habit.frequency === 'daily').length);
   totalStreak.textContent = String(habits.reduce((sum, habit) => sum + habit.streak, 0));
+  completionRate.textContent = `${todayProgress.rate}%`;
+  progressFill.style.width = `${todayProgress.rate}%`;
+  progressFill.parentElement.setAttribute('aria-valuenow', String(todayProgress.rate));
+  progressText.textContent = `${todayProgress.completedCount} / ${todayProgress.dueCount} habitudes complétées`;
 };
 
 habitForm.addEventListener('submit', (event) => {
@@ -343,6 +377,14 @@ habitForm.addEventListener('submit', (event) => {
   renderStats();
   renderHabits();
   renderCalendar();
+});
+
+filterChips.forEach((chip) => {
+  chip.addEventListener('click', () => {
+    activeFilter = chip.dataset.filter;
+    filterChips.forEach((entry) => entry.classList.toggle('is-active', entry === chip));
+    renderHabits();
+  });
 });
 
 habits.forEach((habit) => {

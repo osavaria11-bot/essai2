@@ -26,6 +26,38 @@
           <h2 id="totalStreak">0</h2>
           <p>Streak total</p>
         </article>
+        <article>
+          <h2 id="completionRate">0%</h2>
+          <p>Réussite du jour</p>
+        </article>
+      </section>
+
+      <section class="progress-section" aria-label="Progression du jour">
+        <div class="progress-head">
+          <h2>Objectif du jour</h2>
+          <p id="progressText">0 / 0 habitudes complétées</p>
+        </div>
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progression quotidienne">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+      </section>
+
+      <section class="gallery-section" aria-label="Inspirations visuelles">
+        <h2>Inspirations</h2>
+        <div class="gallery-grid">
+          <article class="gallery-card">
+            <img src="assets/images/training-1.svg" alt="Illustration d'une barre de musculation" loading="lazy" />
+            <p>Planifie ta séance la veille pour démarrer sans friction.</p>
+          </article>
+          <article class="gallery-card">
+            <img src="assets/images/training-2.svg" alt="Illustration de matériel de gym" loading="lazy" />
+            <p>Prépare une routine courte de secours pour les jours chargés.</p>
+          </article>
+          <article class="gallery-card">
+            <img src="assets/images/training-3.svg" alt="Illustration d'une porte de traction" loading="lazy" />
+            <p>Visualise tes progrès: même 15 minutes comptent vraiment.</p>
+          </article>
+        </div>
       </section>
 
       <section class="controls" aria-label="Ajouter une habitude">
@@ -57,7 +89,15 @@
       </section>
 
       <section class="habits-section">
-        <h2>Programme du jour</h2>
+        <div class="habits-header">
+          <h2>Programme du jour</h2>
+          <div class="filter-controls" aria-label="Filtrer les habitudes">
+            <button type="button" class="filter-chip is-active" data-filter="all">Toutes</button>
+            <button type="button" class="filter-chip" data-filter="daily">Quotidiennes</button>
+            <button type="button" class="filter-chip" data-filter="weekly">Hebdo</button>
+            <button type="button" class="filter-chip" data-filter="monthly">Mensuelles</button>
+          </div>
+        </div>
         <ul id="habitList" class="habit-list"></ul>
       </section>
     </main>
