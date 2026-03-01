@@ -1,4 +1,6 @@
-const habits = [
+const STORAGE_KEY = 'mes-habitudes-data';
+
+const defaultHabits = [
   {
     id: 4,
     name: 'Marcher 10 000 pas ou courir 5 km',
@@ -36,6 +38,40 @@ const habits = [
     streak: 0,
   },
 ];
+
+const loadHabits = () => {
+  const storedHabits = localStorage.getItem(STORAGE_KEY);
+  if (!storedHabits) {
+    return defaultHabits;
+  }
+
+  try {
+    const parsedHabits = JSON.parse(storedHabits);
+    if (!Array.isArray(parsedHabits)) {
+      return defaultHabits;
+    }
+
+    return parsedHabits
+      .filter((habit) => typeof habit === 'object' && habit !== null)
+      .map((habit) => ({
+        id: Number(habit.id) || Date.now() + Math.random(),
+        name: typeof habit.name === 'string' ? habit.name : 'Habitude sans nom',
+        description: null,
+        frequency: ['daily', 'weekly', 'monthly'].includes(habit.frequency) ? habit.frequency : 'daily',
+        createdAt: typeof habit.createdAt === 'string' ? habit.createdAt : new Date().toISOString(),
+        logs: Array.isArray(habit.logs) ? habit.logs.filter((entry) => typeof entry === 'string') : [],
+        streak: 0,
+      }));
+  } catch (error) {
+    return defaultHabits;
+  }
+};
+
+let habits = loadHabits();
+
+const saveHabits = () => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
+};
 
 const habitList = document.getElementById('habitList');
 const totalHabits = document.getElementById('totalHabits');
@@ -160,6 +196,7 @@ const toggleDone = (habitId) => {
 
   habit.streak = computeStreak(habit);
 
+  saveHabits();
   renderStats();
   renderHabits();
   renderCalendar();
@@ -172,6 +209,7 @@ const removeHabit = (habitId) => {
   }
 
   habits.splice(index, 1);
+  saveHabits();
   renderStats();
   renderHabits();
   renderCalendar();
@@ -299,6 +337,7 @@ habitForm.addEventListener('submit', (event) => {
     streak: 0,
   });
 
+  saveHabits();
   habitForm.reset();
   habitFrequency.value = 'daily';
   renderStats();
@@ -306,6 +345,11 @@ habitForm.addEventListener('submit', (event) => {
   renderCalendar();
 });
 
+habits.forEach((habit) => {
+  habit.streak = computeStreak(habit);
+});
+
+saveHabits();
 renderStats();
 renderHabits();
 renderCalendar();
