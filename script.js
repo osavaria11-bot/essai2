@@ -69,6 +69,9 @@ const loadHabits = () => {
 
 let habits = loadHabits();
 let activeFilter = 'all';
+const now = new Date();
+let selectedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+let displayedMonthDate = new Date(now.getFullYear(), now.getMonth(), 1);
 
 const saveHabits = () => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
@@ -77,15 +80,25 @@ const saveHabits = () => {
 const habitList = document.getElementById('habitList');
 const totalHabits = document.getElementById('totalHabits');
 const dailyHabits = document.getElementById('dailyHabits');
-const totalStreak = document.getElementById('totalStreak');
-const completionRate = document.getElementById('completionRate');
+const weeklyHabits = document.getElementById('weeklyHabits');
+const monthlyHabits = document.getElementById('monthlyHabits');
 const progressFill = document.getElementById('progressFill');
 const progressText = document.getElementById('progressText');
+const progressHeading = document.getElementById('progressHeading');
 const habitForm = document.getElementById('habitForm');
 const habitName = document.getElementById('habitName');
 const habitFrequency = document.getElementById('habitFrequency');
 const calendarGrid = document.getElementById('calendarGrid');
 const calendarTitle = document.getElementById('calendarTitle');
+const monthPicker = document.getElementById('monthPicker');
+const goMonth = document.getElementById('goMonth');
+const prevMonth = document.getElementById('prevMonth');
+const nextMonth = document.getElementById('nextMonth');
+const prevDay = document.getElementById('prevDay');
+const nextDay = document.getElementById('nextDay');
+const todayButton = document.getElementById('todayButton');
+const selectedDayLabel = document.getElementById('selectedDayLabel');
+const displayedMonth = document.getElementById('displayedMonth');
 const filterChips = [...document.querySelectorAll('.filter-chip')];
 
 const weekdayLabels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
@@ -113,6 +126,22 @@ const formatDate = (isoDate) => {
   return date.toLocaleDateString('fr-FR', {
     day: '2-digit',
     month: 'short',
+    year: 'numeric',
+  });
+};
+
+const formatDayLabel = (date) => {
+  return date.toLocaleDateString('fr-FR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+};
+
+const formatMonthLabel = (date) => {
+  return date.toLocaleDateString('fr-FR', {
+    month: 'long',
     year: 'numeric',
   });
 };
@@ -150,10 +179,9 @@ const getDueHabitsForDate = (date) => {
   });
 };
 
-const getTodayProgress = () => {
-  const today = new Date();
-  const dayKey = toDateKey(today);
-  const dueHabits = getDueHabitsForDate(today);
+const getProgressForDate = (date) => {
+  const dayKey = toDateKey(date);
+  const dueHabits = getDueHabitsForDate(date);
   const completed = dueHabits.filter((habit) => hasLogForDay(habit, dayKey)).length;
   return {
     dueCount: dueHabits.length,
@@ -196,19 +224,23 @@ const computeStreak = (habit) => {
   return streak;
 };
 
+const setDisplayedMonthFromSelectedDate = () => {
+  displayedMonthDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+};
+
 const toggleDone = (habitId) => {
   const habit = habits.find((entry) => entry.id === habitId);
   if (!habit) {
     return;
   }
 
-  const today = new Date();
-  const todayKey = toDateKey(today);
+  const targetKey = toDateKey(selectedDate);
 
-  if (hasLogForDay(habit, todayKey)) {
-    habit.logs = habit.logs.filter((isoDate) => toDateKey(new Date(isoDate)) !== todayKey);
+  if (hasLogForDay(habit, targetKey)) {
+    habit.logs = habit.logs.filter((isoDate) => toDateKey(new Date(isoDate)) !== targetKey);
   } else {
-    habit.logs.push(today.toISOString());
+    const logDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), 12, 0, 0);
+    habit.logs.push(logDate.toISOString());
   }
 
   habit.streak = computeStreak(habit);
@@ -240,6 +272,23 @@ const getFilteredHabits = () => {
   return habits.filter((habit) => habit.frequency === activeFilter);
 };
 
+const populateMonthPicker = () => {
+  monthPicker.innerHTML = '';
+  const baseYear = displayedMonthDate.getFullYear();
+
+  for (let month = 0; month < 12; month += 1) {
+    const optionDate = new Date(baseYear, month, 1);
+    const option = document.createElement('option');
+    option.value = `${baseYear}-${String(month + 1).padStart(2, '0')}`;
+    option.textContent = optionDate.toLocaleDateString('fr-FR', {
+      month: 'long',
+      year: 'numeric',
+    });
+    option.selected = month === displayedMonthDate.getMonth();
+    monthPicker.appendChild(option);
+  }
+};
+
 const renderHabits = () => {
   habitList.innerHTML = '';
 
@@ -254,11 +303,11 @@ const renderHabits = () => {
     return;
   }
 
-  const todayKey = toDateKey(new Date());
+  const selectedDayKey = toDateKey(selectedDate);
 
   visibleHabits.forEach((habit) => {
     const item = document.createElement('li');
-    item.className = `habit-card ${hasLogForDay(habit, todayKey) ? 'done' : ''}`;
+    item.className = `habit-card ${hasLogForDay(habit, selectedDayKey) ? 'done' : ''}`;
 
     const frequency = frequencyLabels[habit.frequency] ?? habit.frequency;
     const details = `Créée le ${formatDate(habit.createdAt)} • Logs: ${habit.logs.length} • Streak: ${habit.streak}`;
@@ -273,7 +322,7 @@ const renderHabits = () => {
           </div>
           <p class="meta">${details}</p>
         </div>
-        <button type="button" class="check-icon ${hasLogForDay(habit, todayKey) ? 'is-done' : ''}" data-action="toggle" aria-label="Valider ${habit.name}" title="Valider du jour">✓</button>
+        <button type="button" class="check-icon ${hasLogForDay(habit, selectedDayKey) ? 'is-done' : ''}" data-action="toggle" aria-label="Valider ${habit.name}" title="Valider le jour sélectionné">✓</button>
       </div>
     `;
 
@@ -292,14 +341,14 @@ const renderHabits = () => {
 const renderCalendar = () => {
   calendarGrid.innerHTML = '';
 
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const monthStart = new Date(displayedMonthDate.getFullYear(), displayedMonthDate.getMonth(), 1);
+  const monthEnd = new Date(displayedMonthDate.getFullYear(), displayedMonthDate.getMonth() + 1, 0);
+  const todayKey = toDateKey(new Date());
+  const selectedKey = toDateKey(selectedDate);
 
-  calendarTitle.textContent = now.toLocaleDateString('fr-FR', {
-    month: 'long',
-    year: 'numeric',
-  });
+  calendarTitle.textContent = `Calendrier - ${formatMonthLabel(displayedMonthDate)}`;
+  displayedMonth.textContent = formatMonthLabel(displayedMonthDate);
+  selectedDayLabel.textContent = formatDayLabel(selectedDate);
 
   weekdayLabels.forEach((label) => {
     const weekdayCell = document.createElement('div');
@@ -316,16 +365,23 @@ const renderCalendar = () => {
   }
 
   for (let day = 1; day <= monthEnd.getDate(); day += 1) {
-    const cellDate = new Date(now.getFullYear(), now.getMonth(), day);
-    const cell = document.createElement('div');
+    const cellDate = new Date(displayedMonthDate.getFullYear(), displayedMonthDate.getMonth(), day);
+    const cell = document.createElement('button');
     const dayNumber = document.createElement('span');
 
+    cell.type = 'button';
     cell.className = 'calendar-day';
     dayNumber.className = 'calendar-day-number';
     dayNumber.textContent = String(day);
 
-    if (toDateKey(cellDate) === toDateKey(now)) {
+    const cellKey = toDateKey(cellDate);
+
+    if (cellKey === todayKey) {
       cell.classList.add('is-today');
+    }
+
+    if (cellKey === selectedKey) {
+      cell.classList.add('is-selected');
     }
 
     if (isPerfectDay(cellDate)) {
@@ -337,20 +393,28 @@ const renderCalendar = () => {
     }
 
     cell.appendChild(dayNumber);
+    cell.addEventListener('click', () => {
+      selectedDate = new Date(cellDate.getFullYear(), cellDate.getMonth(), cellDate.getDate());
+      renderStats();
+      renderHabits();
+      renderCalendar();
+    });
+
     calendarGrid.appendChild(cell);
   }
 };
 
 const renderStats = () => {
-  const todayProgress = getTodayProgress();
+  const selectedProgress = getProgressForDate(selectedDate);
 
   totalHabits.textContent = String(habits.length);
   dailyHabits.textContent = String(habits.filter((habit) => habit.frequency === 'daily').length);
-  totalStreak.textContent = String(habits.reduce((sum, habit) => sum + habit.streak, 0));
-  completionRate.textContent = `${todayProgress.rate}%`;
-  progressFill.style.width = `${todayProgress.rate}%`;
-  progressFill.parentElement.setAttribute('aria-valuenow', String(todayProgress.rate));
-  progressText.textContent = `${todayProgress.completedCount} / ${todayProgress.dueCount} habitudes complétées`;
+  weeklyHabits.textContent = String(habits.filter((habit) => habit.frequency === 'weekly').length);
+  monthlyHabits.textContent = String(habits.filter((habit) => habit.frequency === 'monthly').length);
+  progressHeading.textContent = `Objectif du ${formatDayLabel(selectedDate)}`;
+  progressFill.style.width = `${selectedProgress.rate}%`;
+  progressFill.parentElement.setAttribute('aria-valuenow', String(selectedProgress.rate));
+  progressText.textContent = `${selectedProgress.completedCount} / ${selectedProgress.dueCount} habitudes complétées`;
 };
 
 habitForm.addEventListener('submit', (event) => {
@@ -387,11 +451,71 @@ filterChips.forEach((chip) => {
   });
 });
 
+prevDay.addEventListener('click', () => {
+  selectedDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate() - 1);
+  setDisplayedMonthFromSelectedDate();
+  populateMonthPicker();
+  renderStats();
+  renderHabits();
+  renderCalendar();
+});
+
+nextDay.addEventListener('click', () => {
+  selectedDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate() + 1);
+  setDisplayedMonthFromSelectedDate();
+  populateMonthPicker();
+  renderStats();
+  renderHabits();
+  renderCalendar();
+});
+
+todayButton.addEventListener('click', () => {
+  const current = new Date();
+  selectedDate = new Date(current.getFullYear(), current.getMonth(), current.getDate());
+  setDisplayedMonthFromSelectedDate();
+  populateMonthPicker();
+  renderStats();
+  renderHabits();
+  renderCalendar();
+});
+
+prevMonth.addEventListener('click', () => {
+  displayedMonthDate = new Date(displayedMonthDate.getFullYear(), displayedMonthDate.getMonth() - 1, 1);
+  populateMonthPicker();
+  renderCalendar();
+});
+
+nextMonth.addEventListener('click', () => {
+  displayedMonthDate = new Date(displayedMonthDate.getFullYear(), displayedMonthDate.getMonth() + 1, 1);
+  populateMonthPicker();
+  renderCalendar();
+});
+
+goMonth.addEventListener('click', () => {
+  if (!monthPicker.value) {
+    return;
+  }
+
+  const [year, month] = monthPicker.value.split('-').map(Number);
+  displayedMonthDate = new Date(year, month - 1, 1);
+
+  const selectedYear = selectedDate.getFullYear();
+  const selectedMonth = selectedDate.getMonth();
+  if (selectedYear !== year || selectedMonth !== month - 1) {
+    selectedDate = new Date(year, month - 1, 1);
+  }
+
+  renderStats();
+  renderHabits();
+  renderCalendar();
+});
+
 habits.forEach((habit) => {
   habit.streak = computeStreak(habit);
 });
 
 saveHabits();
+populateMonthPicker();
 renderStats();
 renderHabits();
 renderCalendar();
