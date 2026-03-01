@@ -10,7 +10,7 @@
     <main class="container">
       <header class="header">
         <h1>🏋️ Mes habitudes</h1>
-        <p>Un tableau interactif pour suivre ta routine quotidienne.</p>
+        <p>Un tableau interactif pour suivre ta routine quotidienne, hebdomadaire et mensuelle.</p>
       </header>
 
       <section class="stats" aria-label="Résumé des habitudes">
@@ -20,11 +20,15 @@
         </article>
         <article>
           <h2 id="dailyHabits">0</h2>
-          <p>Fréquence quotidienne</p>
+          <p>Quotidiennes</p>
         </article>
         <article>
-          <h2 id="totalStreak">0</h2>
-          <p>Streak total</p>
+          <h2 id="weeklyHabits">0</h2>
+          <p>Hebdomadaires</p>
+        </article>
+        <article>
+          <h2 id="monthlyHabits">0</h2>
+          <p>Mensuelles</p>
         </article>
       </section>
 
@@ -48,16 +52,34 @@
         </form>
       </section>
 
+      <section class="selection-panel" aria-label="Date et filtre">
+        <div class="selected-date-block">
+          <h2 id="selectedDateTitle">Date sélectionnée</h2>
+          <p id="selectedDateSubtitle"></p>
+        </div>
+        <div class="view-filters" role="tablist" aria-label="Filtrer les habitudes">
+          <button type="button" data-filter="all" class="filter-btn is-active">Toutes</button>
+          <button type="button" data-filter="daily" class="filter-btn">Quotidiennes</button>
+          <button type="button" data-filter="weekly" class="filter-btn">Hebdomadaires</button>
+          <button type="button" data-filter="monthly" class="filter-btn">Mensuelles</button>
+        </div>
+      </section>
+
       <section class="calendar-section" aria-label="Calendrier des accomplissements">
         <div class="calendar-header">
-          <h2 id="calendarTitle">Calendrier</h2>
-          <p>🔥 = toutes les tâches prévues ce jour sont accomplies</p>
+          <h2 id="calendarTitle">Calendrier annuel</h2>
+          <div class="year-controls">
+            <button type="button" id="prevYearBtn" aria-label="Année précédente">←</button>
+            <span id="yearLabel"></span>
+            <button type="button" id="nextYearBtn" aria-label="Année suivante">→</button>
+          </div>
         </div>
-        <div id="calendarGrid" class="calendar-grid"></div>
+        <p>🔥 = toutes les tâches prévues ce jour sont accomplies • Clique sur un jour pour le sélectionner.</p>
+        <div id="calendarGrid" class="calendar-year-grid"></div>
       </section>
 
       <section class="habits-section">
-        <h2>Programme du jour</h2>
+        <h2 id="habitListTitle">Habitudes du jour</h2>
         <ul id="habitList" class="habit-list"></ul>
       </section>
     </main>
