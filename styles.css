@@ -103,6 +103,73 @@ body {
   background: #1d4ed8;
 }
 
+.calendar-section {
+  margin-bottom: 1.5rem;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.calendar-header h2 {
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.calendar-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+  padding: 0.2rem;
+}
+
+.calendar-day {
+  min-height: 68px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #f8fbff;
+  position: relative;
+  padding: 0.35rem;
+}
+
+.calendar-day.is-empty {
+  border-color: transparent;
+  background: transparent;
+}
+
+.calendar-day.is-today {
+  box-shadow: inset 0 0 0 2px #3b82f6;
+}
+
+.calendar-day-number {
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.35rem;
+  font-size: 0.8rem;
+  color: #334155;
+}
+
+.calendar-flame {
+  font-size: 1.2rem;
+}
+
 .habits-section h2 {
   margin: 0 0 0.75rem;
 }
@@ -157,6 +224,48 @@ body {
   font-size: 0.9rem;
 }
 
+.habit-card-layout {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.habit-main {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.trash-icon {
+  justify-self: start;
+  border: none;
+  background: transparent;
+  color: #991b1b;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+
+.trash-icon:hover {
+  transform: scale(1.08);
+}
+
+.check-icon {
+  border: none;
+  background: transparent;
+  color: #16a34a;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 0.15rem;
+  cursor: pointer;
+  opacity: 0.45;
+}
+
+.check-icon.is-done {
+  opacity: 1;
+  text-shadow: 0 0 12px rgba(22, 163, 74, 0.25);
 .actions {
   display: flex;
   gap: 0.5rem;
@@ -195,9 +304,21 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .habit-title-row {
+  .calendar-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .calendar-day {
+    min-height: 56px;
+  }
+
+  .habit-card-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .check-icon {
+    justify-self: end;
   }
 
   .habit-form {
