@@ -39,10 +39,47 @@ const defaultHabits = [
   },
 ];
 
+const normalizeHabit = (habit, fallbackIdSeed = Date.now() + Math.random()) => ({
+  id: Number(habit.id) || fallbackIdSeed,
+  name: typeof habit.name === 'string' ? habit.name : 'Habitude sans nom',
+  description: null,
+  frequency: ['daily', 'weekly', 'monthly'].includes(habit.frequency) ? habit.frequency : 'daily',
+  createdAt: typeof habit.createdAt === 'string' ? habit.createdAt : new Date().toISOString(),
+  logs: Array.isArray(habit.logs) ? habit.logs.filter((entry) => typeof entry === 'string') : [],
+  streak: 0,
+});
+
+const mergeHabits = (storedHabits, fallbackHabits) => {
+  const fallbackByName = new Map(
+    fallbackHabits.map((habit) => [habit.name.trim().toLowerCase(), normalizeHabit(habit)]),
+  );
+  const merged = [];
+
+  storedHabits.forEach((habit, index) => {
+    const normalizedStored = normalizeHabit(habit, Date.now() + index + Math.random());
+    const key = normalizedStored.name.trim().toLowerCase();
+
+    if (fallbackByName.has(key)) {
+      const fallbackHabit = fallbackByName.get(key);
+      merged.push({
+        ...fallbackHabit,
+        ...normalizedStored,
+        id: normalizedStored.id,
+      });
+      fallbackByName.delete(key);
+      return;
+    }
+
+    merged.push(normalizedStored);
+  });
+
+  return [...merged, ...fallbackByName.values()];
+};
+
 const loadHabits = () => {
   const storedHabits = localStorage.getItem(STORAGE_KEY);
   if (!storedHabits) {
-    return defaultHabits;
+    return defaultHabits.map((habit, index) => normalizeHabit(habit, Date.now() + index + Math.random()));
   }
 
   try {
@@ -51,19 +88,10 @@ const loadHabits = () => {
       return defaultHabits;
     }
 
-    return parsedHabits
-      .filter((habit) => typeof habit === 'object' && habit !== null)
-      .map((habit) => ({
-        id: Number(habit.id) || Date.now() + Math.random(),
-        name: typeof habit.name === 'string' ? habit.name : 'Habitude sans nom',
-        description: null,
-        frequency: ['daily', 'weekly', 'monthly'].includes(habit.frequency) ? habit.frequency : 'daily',
-        createdAt: typeof habit.createdAt === 'string' ? habit.createdAt : new Date().toISOString(),
-        logs: Array.isArray(habit.logs) ? habit.logs.filter((entry) => typeof entry === 'string') : [],
-        streak: 0,
-      }));
+    const safeHabits = parsedHabits.filter((habit) => typeof habit === 'object' && habit !== null);
+    return mergeHabits(safeHabits, defaultHabits);
   } catch (error) {
-    return defaultHabits;
+    return defaultHabits.map((habit, index) => normalizeHabit(habit, Date.now() + index + Math.random()));
   }
 };
 
