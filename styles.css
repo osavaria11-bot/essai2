@@ -266,6 +266,8 @@ body {
 .check-icon.is-done {
   opacity: 1;
   text-shadow: 0 0 12px rgba(22, 163, 74, 0.25);
+}
+
 .actions {
   display: flex;
   gap: 0.5rem;
