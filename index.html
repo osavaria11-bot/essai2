@@ -20,21 +20,21 @@
         </article>
         <article>
           <h2 id="dailyHabits">0</h2>
-          <p>Fréquence quotidienne</p>
+          <p>Quotidiennes</p>
         </article>
         <article>
-          <h2 id="totalStreak">0</h2>
-          <p>Streak total</p>
+          <h2 id="weeklyHabits">0</h2>
+          <p>Hebdomadaires</p>
         </article>
         <article>
-          <h2 id="completionRate">0%</h2>
-          <p>Réussite du jour</p>
+          <h2 id="monthlyHabits">0</h2>
+          <p>Mensuelles</p>
         </article>
       </section>
 
       <section class="progress-section" aria-label="Progression du jour">
         <div class="progress-head">
-          <h2>Objectif du jour</h2>
+          <h2 id="progressHeading">Objectif du jour</h2>
           <p id="progressText">0 / 0 habitudes complétées</p>
         </div>
         <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progression quotidienne">
@@ -82,8 +82,26 @@
 
       <section class="calendar-section" aria-label="Calendrier des accomplissements">
         <div class="calendar-header">
-          <h2 id="calendarTitle">Calendrier</h2>
-          <p>🔥 = toutes les tâches prévues ce jour sont accomplies</p>
+          <div class="calendar-title-wrap">
+            <h2 id="calendarTitle">Calendrier</h2>
+            <p>🔥 = toutes les tâches prévues ce jour sont accomplies</p>
+          </div>
+          <div class="calendar-controls" aria-label="Choisir un mois">
+            <button id="prevMonth" type="button">←</button>
+            <select id="monthPicker" aria-label="Sélection du mois"></select>
+            <button id="goMonth" type="button">Valider</button>
+            <button id="nextMonth" type="button">→</button>
+          </div>
+        </div>
+        <div class="day-controls" aria-label="Changer de jour">
+          <button id="prevDay" type="button">Jour précédent</button>
+          <p id="selectedDayLabel">Aujourd'hui</p>
+          <button id="nextDay" type="button">Jour suivant</button>
+          <button id="todayButton" type="button">Revenir à aujourd'hui</button>
+        </div>
+        <div class="calendar-current-month">
+          <label for="monthPicker">Mois affiché :</label>
+          <strong id="displayedMonth">-</strong>
         </div>
         <div id="calendarGrid" class="calendar-grid"></div>
       </section>
