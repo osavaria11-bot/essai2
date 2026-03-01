@@ -10,7 +10,7 @@
     <main class="container">
       <header class="header">
         <h1>🏋️ Mes habitudes</h1>
-        <p>Un tableau simple pour suivre ta routine quotidienne.</p>
+        <p>Un tableau interactif pour suivre ta routine quotidienne.</p>
       </header>
 
       <section class="stats" aria-label="Résumé des habitudes">
@@ -26,6 +26,34 @@
           <h2 id="totalStreak">0</h2>
           <p>Streak total</p>
         </article>
+      </section>
+
+      <section class="controls" aria-label="Ajouter une habitude">
+        <form id="habitForm" class="habit-form">
+          <label>
+            Habitude
+            <input id="habitName" name="name" type="text" placeholder="Ex: 30 pompes" required maxlength="80" />
+          </label>
+
+          <label>
+            Fréquence
+            <select id="habitFrequency" name="frequency">
+              <option value="daily">Quotidienne</option>
+              <option value="weekly">Hebdomadaire</option>
+              <option value="monthly">Mensuelle</option>
+            </select>
+          </label>
+
+          <button type="submit">Ajouter</button>
+        </form>
+      </section>
+
+      <section class="calendar-section" aria-label="Calendrier des accomplissements">
+        <div class="calendar-header">
+          <h2 id="calendarTitle">Calendrier</h2>
+          <p>🔥 = toutes les tâches prévues ce jour sont accomplies</p>
+        </div>
+        <div id="calendarGrid" class="calendar-grid"></div>
       </section>
 
       <section class="habits-section">
